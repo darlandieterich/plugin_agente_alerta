@@ -64,10 +64,11 @@ class block_agente_alerta extends block_base
                     ////////////////////////////////////////
                     if($USER->lastlogin > $USER->lastcourseaccess[$curso->id] && $totrs > 0)
                     {
-                        $this->content->text .= "<h5>faz tempo que não passa por aqui!</h5>";
+                        $this->content->text .= "<h5>Faz tempo que não passa por aqui!</h5>";
                         //$this->content->text .= date("d/m/Y H:i:s",$USER->lastlogin).'<br/>';
                         //$this->content->text .= date("d/m/Y H:i:s",$USER->lastcourseaccess[$curso->id]);
-                    }                            
+                    }
+                    //print_r($rstarefas);
                     ////////////////////////////////////////
                     if($totrs>0)
                     {
@@ -82,17 +83,17 @@ class block_agente_alerta extends block_base
                                 $this->content->text .= "
                                 <div>".$dados->name." 
                                     [<img alt='Enviada' src='".$CFG->wwwroot.'/blocks/agente_alerta/pix/_submit.gif'."'>
-                                    <a href='mod/assignment/view.php?id=".$dados->id."'><img alt='Acessar tarefa' src='".$CFG->wwwroot.'/blocks/agente_alerta/pix/view_assign.gif'."'></a>]
+                                    <a href='mod/assignment/view.php?id=".$this->get_id_assignment($dados->id)."'><img alt='Acessar tarefa' src='".$CFG->wwwroot.'/blocks/agente_alerta/pix/view_assign.gif'."'></a>]
                                     <span style='font-size:8px'>até ". date(" d/m/Y",$dados->timedue)."
                                     </span>
                                 </div>";
                                 $cont_t_s++;
                             }
-                            else
+                            else                                                                                               
                                 $this->content->text .= "
                             <div>".$dados->name." 
-                                [<img alt='Não enviada' src='".$CFG->wwwroot.'/blocks/agente_alerta/pix/_nsubmit.gif'."'>]
-                                [<a href='mod/assignment/view.php?id=".$dados->id."'><img alt='Acessar tarefa' src='".$CFG->wwwroot.'/blocks/agente_alerta/pix/view_assign.gif'."'></a>]
+                                [<img alt='Não enviada' src='".$CFG->wwwroot.'/blocks/agente_alerta/pix/_nsubmit.gif'."'>
+                                <a href='mod/assignment/view.php?id=".$this->get_id_assignment($dados->id)."'><img alt='Acessar tarefa' src='".$CFG->wwwroot.'/blocks/agente_alerta/pix/view_assign.gif'."'></a>]
                                 <span style='font-size:8px'> até ". date(" d/m/Y",$dados->timedue)."
                                 </span>
                             </div>";                            
@@ -101,12 +102,11 @@ class block_agente_alerta extends block_base
                         $this->content->text .= "Sem Tarefas! <img alt='Sem tarefas!' src='".$CFG->wwwroot.'/blocks/agente_alerta/pix/smile.gif'."'></br>";
                     //acomula as tarefas//
                     $contaref += $totrs;
-                }                
+                }                                
                 $this->content->text .= "<hr>";
                 $this->content->text .= "Tarefas em aberto:<b> ".$contaref."</b></br>";
                 $this->content->text .= "Tarefas submetidas:<b> ".$cont_t_s."</b></br>";
-                $this->content->text .= "Seu desempenho:<b> /10</b>";
-                //$this->content->text .= "";                
+                $this->content->text .= "Seu desempenho:<b> --</b>";                
             }            
             //var_dump($USER);
             //echo(MOODLE_INTERNAL);
@@ -116,4 +116,11 @@ class block_agente_alerta extends block_base
         }
         //print_object($USER);        
     }
+    function get_id_assignment($id){
+        global $DB;
+        $sql   = "SELECT * FROM mdl_course_modules cm WHERE cm.module = 1 AND cm.instance = ?";
+        $param = array($id);
+        $data  = $DB->get_record_sql($sql,$param);        
+        return $data->id;        
+    }    
 }
